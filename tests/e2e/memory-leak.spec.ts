@@ -23,7 +23,9 @@ const DURATION = Number(process.env.MESH_LEAK_DURATION_MS ?? 60_000);
 const BUDGET_MB = Number(process.env.MESH_LEAK_BUDGET_MB ?? 15);
 const NOISE_OPS = Number(process.env.MESH_LEAK_NOISE_OPS ?? 200);
 
-test("memory leak — heap growth stays under budget over a long-running room", async ({ browser }) => {
+test("memory leak — heap growth stays under budget over a long-running room", async ({
+  browser,
+}) => {
   const ctx = await browser.newContext();
   await ctx.addInitScript(
     ({ prefix, room }) => {
@@ -59,7 +61,9 @@ test("memory leak — heap growth stays under budget over a long-running room", 
 
   const after = await measureHeap(a);
   const grewMB = (after - before) / (1024 * 1024);
-  console.log(`[mem-leak] before=${(before / 1e6).toFixed(1)}MB after=${(after / 1e6).toFixed(1)}MB grew=${grewMB.toFixed(2)}MB (budget=${BUDGET_MB}MB)`);
+  console.log(
+    `[mem-leak] before=${(before / 1e6).toFixed(1)}MB after=${(after / 1e6).toFixed(1)}MB grew=${grewMB.toFixed(2)}MB (budget=${BUDGET_MB}MB)`,
+  );
 
   expect(grewMB, `JS heap grew beyond budget (${BUDGET_MB}MB)`).toBeLessThanOrEqual(BUDGET_MB);
 
@@ -74,7 +78,11 @@ async function measureHeap(page: import("@playwright/test").Page): Promise<numbe
   await cdp.send("HeapProfiler.collectGarbage");
   await page.waitForTimeout(100);
   // performance.memory is Chromium-specific. Playwright runs Chromium.
-  return page.evaluate(() => (performance as Performance & { memory?: { usedJSHeapSize: number } }).memory?.usedJSHeapSize ?? 0);
+  return page.evaluate(
+    () =>
+      (performance as Performance & { memory?: { usedJSHeapSize: number } }).memory
+        ?.usedJSHeapSize ?? 0,
+  );
 }
 
 async function clickAnything(page: import("@playwright/test").Page): Promise<void> {
