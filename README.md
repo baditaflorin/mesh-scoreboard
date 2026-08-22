@@ -1,10 +1,10 @@
-# __APP_NAME__
+# **APP_NAME**
 
 [![pages](https://img.shields.io/badge/live-baditaflorin.github.io%2F__APP_NAME__-__ACCENT_NOHASH__)](https://baditaflorin.github.io/__APP_NAME__/)
 [![version](https://img.shields.io/badge/version-0.1.0-blue)](https://github.com/baditaflorin/__APP_NAME__/blob/main/package.json)
 [![license](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 
-> __DESCRIPTION__
+> **DESCRIPTION**
 
 **Live → https://baditaflorin.github.io/__APP_NAME__/**
 
@@ -46,11 +46,11 @@ npm run dev
 
 ## Self-hosted infrastructure
 
-| Repo | Endpoint | Purpose |
-|---|---|---|
-| https://github.com/baditaflorin/signaling-server | `wss://turn.0docker.com/ws` | y-webrtc signaling fan-out |
+| Repo                                              | Endpoint                               | Purpose                     |
+| ------------------------------------------------- | -------------------------------------- | --------------------------- |
+| https://github.com/baditaflorin/signaling-server  | `wss://turn.0docker.com/ws`            | y-webrtc signaling fan-out  |
 | https://github.com/baditaflorin/turn-token-server | `https://turn.0docker.com/credentials` | HMAC TURN creds, 1-hour TTL |
-| https://github.com/baditaflorin/coturn-hetzner | `turn:turn.0docker.com:3479` | TURN relay |
+| https://github.com/baditaflorin/coturn-hetzner    | `turn:turn.0docker.com:3479`           | TURN relay                  |
 
 ## Settings overrides
 
@@ -83,6 +83,7 @@ bash ../mesh-common/scripts/screenshot-app.sh    # regenerate docs/screenshot.pn
 ## Privacy
 
 <!-- mesh:privacy-section:start -->
+
 Everything you publish to a room is visible to every peer in that room. Your local device's name, key, and choices stay local. Cryptographic signatures prove **who** wrote each entry; they do **not** prevent peers from reading or copying entries. The room URL is the access control — share it deliberately.
 
 See `docs/privacy.md` for the full threat model — capabilities used, what other peers in the mesh see, what the self-hosted infra sees, what stays local.

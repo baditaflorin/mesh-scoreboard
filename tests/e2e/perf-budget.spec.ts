@@ -39,7 +39,11 @@ test("perf budget — LCP + TBT under threshold on cold load", async ({ page }) 
         }
         setTimeout(() => {
           obs.disconnect();
-          resolve(last ? (last as PerformanceEntry & { renderTime?: number }).renderTime ?? last.startTime : null);
+          resolve(
+            last
+              ? ((last as PerformanceEntry & { renderTime?: number }).renderTime ?? last.startTime)
+              : null,
+          );
         }, 6000);
       }),
   );
@@ -50,7 +54,9 @@ test("perf budget — LCP + TBT under threshold on cold load", async ({ page }) 
     return tasks.reduce((acc, t) => acc + Math.max(0, t.duration - 50), 0);
   });
 
-  console.log(`[perf-budget] LCP=${lcp ?? "?"}ms TBT=${tbt}ms (budget LCP<=${LCP_MS} TBT<=${TBT_MS})`);
+  console.log(
+    `[perf-budget] LCP=${lcp ?? "?"}ms TBT=${tbt}ms (budget LCP<=${LCP_MS} TBT<=${TBT_MS})`,
+  );
 
   expect(lcp ?? 0, `LCP exceeded budget (${LCP_MS}ms)`).toBeLessThanOrEqual(LCP_MS);
   expect(tbt, `TBT exceeded budget (${TBT_MS}ms)`).toBeLessThanOrEqual(TBT_MS);
@@ -74,12 +80,18 @@ test("perf budget — INP under threshold after one interaction", async ({ page 
       new Promise<number | null>((resolve) => {
         let worst = 0;
         const obs = new PerformanceObserver((list) => {
-          for (const entry of list.getEntries() as Array<PerformanceEntry & { interactionId?: number; duration: number }>) {
+          for (const entry of list.getEntries() as Array<
+            PerformanceEntry & { interactionId?: number; duration: number }
+          >) {
             if (entry.interactionId && entry.duration > worst) worst = entry.duration;
           }
         });
         try {
-          obs.observe({ type: "event", buffered: true, durationThreshold: 16 } as PerformanceObserverInit);
+          obs.observe({
+            type: "event",
+            buffered: true,
+            durationThreshold: 16,
+          } as PerformanceObserverInit);
         } catch {
           resolve(null);
           return;
