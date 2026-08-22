@@ -1,0 +1,7 @@
+{
+  "$schema": "https://baditaflorin.github.io/mesh-common/mesh-service.schema.json",
+  "id": "mesh-scoreboard",
+  "category": "Games",
+  "subcategory": "Party & tabletop",
+  "useCases": ["party games", "challenges", "score keeping"]
+}
