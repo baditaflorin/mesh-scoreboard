@@ -13,6 +13,10 @@ export default defineConfig({
   timeout: 30_000,
   expect: { timeout: 5_000 },
   fullyParallel: false,
+  // This app deliberately exercises two-browser Yjs rooms. Keep files serial
+  // as well so a busy CI runner cannot make independent room tests contend
+  // for BroadcastChannel / preview-server timing.
+  workers: 1,
   reporter: process.env["CI"] ? "list" : [["list"], ["json", { outputFile: "test-results.json" }]],
   use: {
     baseURL,

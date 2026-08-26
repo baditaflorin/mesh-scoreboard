@@ -1,94 +1,77 @@
-# **APP_NAME**
+# Scoreboard
 
-[![pages](https://img.shields.io/badge/live-baditaflorin.github.io%2F__APP_NAME__-__ACCENT_NOHASH__)](https://baditaflorin.github.io/__APP_NAME__/)
-[![version](https://img.shields.io/badge/version-0.1.0-blue)](https://github.com/baditaflorin/__APP_NAME__/blob/main/package.json)
-[![license](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
+[![live demo](https://img.shields.io/badge/live-Scoreboard-f5b942)](https://baditaflorin.github.io/mesh-scoreboard/)
+[![license](https://img.shields.io/badge/license-MIT-65d99c)](./LICENSE)
 
-> **DESCRIPTION**
+> A focused, peer-to-peer match board that makes every score change visible to the people in the room.
 
-**Live → https://baditaflorin.github.io/__APP_NAME__/**
+**Live → [baditaflorin.github.io/mesh-scoreboard](https://baditaflorin.github.io/mesh-scoreboard/)**
 
-**Source → https://github.com/baditaflorin/__APP_NAME__**
+![Scoreboard on one device](docs/screenshot.png)
 
-**Tip the dev (buy a coffee) → https://www.paypal.com/paypalme/florinbadita**
+![Two peers keeping the same score](docs/preview.png)
 
----
+## What it does
 
-![screenshot](docs/screenshot.png)
+Scoreboard is a deliberate alternative to passing a phone around or opening a busy spreadsheet during a game. Choose the room from Settings, add your player name, and call points. Each player can adjust their own score; the ordered ledger is derived from the shared Yjs score map and updates for every connected peer.
 
-> Two peers, side-by-side, in the same room. Drop a `tests/demo/scenario.mjs`
-> exporting `default async (a, b) => …` and run `npm run demo` to regenerate
-> `docs/preview.png` plus `docs/demo-a.webm` / `docs/demo-b.webm` clips.
+- `+1`, `+2`, and `−1` change your own score only.
+- Player names are published to the people in the selected room so the ledger is attributable.
+- Reset is a two-step action because it clears the shared board for everyone in the room.
+- There is no account, server-side score database, or simulated sync state.
 
-![preview](docs/preview.png)
+The board is intentionally ephemeral: its shared state exists while the room has connected peers. Use the top-bar **Invite** action to bring another device into the same room.
 
-## What it is
+## A real two-peer interaction
 
-A **rootless-computing** peer-to-peer browser app. No backend of its own beyond the self-hosted WebRTC stack listed below. State lives in a Yjs mesh shared by everyone in the same room.
+![Ari and Bea calling a shared score](docs/demo.gif)
 
-Read the principles → **https://baditaflorin.github.io/rootless-computing/principles.html**
+The recorded demo runs two browser peers in the same room: Ari adds one point, Bea adds two, and both ledgers render the same standings.
 
-## Quickstart
+## Run it locally
 
-Open the live URL on two devices in the same room (set in ⚙ settings, or scan the room QR). Everything else is in-app.
-
-For local hacking:
+`mesh-common` must be a sibling directory because this app consumes it through `file:../mesh-common`.
 
 ```bash
 git clone https://github.com/baditaflorin/mesh-common
-git clone https://github.com/baditaflorin/__APP_NAME__
-cd __APP_NAME__
-npm install
+git clone https://github.com/baditaflorin/mesh-scoreboard
+cd mesh-common && npm ci
+cd ../mesh-scoreboard && npm ci
 npm run dev
 ```
 
-`mesh-common` must sit as a **sibling** directory because `package.json` references it via `file:../mesh-common`.
+Open the local URL in two tabs or devices, select the same room in **Settings**, and call a point from either board.
 
-## Self-hosted infrastructure
-
-| Repo                                              | Endpoint                               | Purpose                     |
-| ------------------------------------------------- | -------------------------------------- | --------------------------- |
-| https://github.com/baditaflorin/signaling-server  | `wss://turn.0docker.com/ws`            | y-webrtc signaling fan-out  |
-| https://github.com/baditaflorin/turn-token-server | `https://turn.0docker.com/credentials` | HMAC TURN creds, 1-hour TTL |
-| https://github.com/baditaflorin/coturn-hetzner    | `turn:turn.0docker.com:3479`           | TURN relay                  |
-
-## Settings overrides
-
-The settings drawer lets the user override signaling and TURN endpoints. localStorage keys:
-
-- `__APP_NAME__:signalingUrl`
-- `__APP_NAME__:turnTokenUrl`
-- `__APP_NAME__:iceServers`
-- `__APP_NAME__:room`
-
-If endpoints are blank or unreachable, the app falls back to STUN-only.
-
-## Version + commit on every screen
-
-The bottom-right footer on every screen of the live app shows:
-
-- `source` → this repo
-- `tip ♥` → PayPal
-- `vX.Y.Z · <short-sha>` — version from `package.json` plus the build-time git commit
-
-## Build & deploy
-
-GitHub Pages serves the committed `docs/` directory on the `main` branch. There is no GitHub Actions build workflow; local Husky-style hooks gate formatting / typecheck / smoke build before each push.
+## Verification
 
 ```bash
-npm run smoke                                    # build + sanity-check docs/
-bash ../mesh-common/scripts/screenshot-app.sh    # regenerate docs/screenshot.png
+npm run fmt:check
+npm run typecheck
+npm run test:unit
+npm run smoke
+npm run test:e2e
+MESH_RUN_LEAK_TEST=1 MESH_LEAK_DURATION_MS=5000 npm run test:leak
+npm audit
+npm run audit:security
 ```
 
-## Privacy
+The end-to-end suite proves that two browser peers receive the same score map, checks phone and short-desktop first viewports, and captures test screenshots. To regenerate public demo assets:
 
-<!-- mesh:privacy-section:start -->
+```bash
+npm run screenshot
+npm run demo
+```
 
-Everything you publish to a room is visible to every peer in that room. Your local device's name, key, and choices stay local. Cryptographic signatures prove **who** wrote each entry; they do **not** prevent peers from reading or copying entries. The room URL is the access control — share it deliberately.
+`npm run audit:security` writes a current public report to [docs/security-audit.md](docs/security-audit.md).
 
-See `docs/privacy.md` for the full threat model — capabilities used, what other peers in the mesh see, what the self-hosted infra sees, what stays local.
-<!-- mesh:privacy-section:end -->
+## Privacy and infrastructure
+
+The room ID is the access boundary: anyone in a room can see all player names and scores shared there. The self-hosted signaling and TURN services broker connectivity, but do not hold a server-side score database. Read the full [privacy note](docs/privacy.md) before using a room with people you do not know.
+
+## Deployment
+
+GitHub Pages serves the committed `docs/` directory from the repository’s default branch. The project uses Woodpecker for CI; it intentionally has no GitHub Actions workflow.
 
 ## License
 
-MIT — see `LICENSE`.
+MIT — see [LICENSE](LICENSE).

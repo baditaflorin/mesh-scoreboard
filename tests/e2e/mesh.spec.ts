@@ -34,11 +34,11 @@ test("two peers in the same room can both load", async ({ browser, baseURL }) =>
     // accessibility tree. Close it on each peer before asserting the shared
     // app surface, without changing the app's onboarding behavior.
     await Promise.all([closeInitiallyOpenSettings(a), closeInitiallyOpenSettings(b)]);
-    await expect(a.locator(".mesh-self-ref, .self-ref").first()).toBeVisible();
-    await expect(b.locator(".mesh-self-ref, .self-ref").first()).toBeVisible();
-    // Both should reach a non-loading state within the timeout — most apps
-    // either show a count, a heading, or a primary control. We assert that
-    // at least one <h1> is present on both pages.
+    // The visual shell deliberately keeps source/support metadata in Settings
+    // rather than leaving a prototype footer in the first viewport. The real
+    // release signal is the product shell and its own main heading.
+    await expect(a.locator("[data-mesh-app-shell]").first()).toBeVisible();
+    await expect(b.locator("[data-mesh-app-shell]").first()).toBeVisible();
     await expect(a.getByRole("heading", { level: 1 }).first()).toBeVisible();
     await expect(b.getByRole("heading", { level: 1 }).first()).toBeVisible();
   } finally {
