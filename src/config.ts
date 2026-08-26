@@ -2,6 +2,7 @@ import { createMeshConfig } from "@baditaflorin/mesh-common";
 
 export const config = createMeshConfig({
   appName: "mesh-scoreboard",
+  breadcrumbs: false,
   displayName: "Scoreboard",
   visualProfile: "play",
   shellLayout: "inset",
